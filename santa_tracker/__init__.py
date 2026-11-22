@@ -314,7 +314,7 @@ def plan(now):
     # whole seconds: the board's calendar won't take a part of one
     now = int(now)
     local = time.gmtime(now + offset(now))
-    year, month, day, hour = local[0], local[1], local[2], local[3]
+    year, month, day = local[0], local[1], local[2]
     go = takeoff_of(year)
     since = now - go
     # nights from today to christmas morning, this year's or next
@@ -979,7 +979,7 @@ def draw_close(since, ticks, a, b, heading, there):
     done = [(x, y) for index, x, y, major in region_stops if index <= upto and not major]
     # the houses still waiting are pale dots
     screen.pen = WAITING
-    for index, x, y, major in region_stops:
+    for index, x, y, _ in region_stops:
         if index > upto:
             screen.rectangle(x, y, 2, 2)
     twinkles(done, ticks)
@@ -1014,7 +1014,7 @@ def draw_local(since, ticks):
         been = index + (1 if there and index < len(last_stops) else 0)
         towns = last_stops
     done = []
-    for i, (a2, b2, name, km) in enumerate(last_stops + away_stops):
+    for i, (a2, b2, _, _) in enumerate(last_stops + away_stops):
         x, y = local.at(a2, b2)
         x, y = round(x), round(y)
         if i < been:
@@ -1303,10 +1303,11 @@ def update():
         loop = film(name).seconds if len(scenes) == 1 else LOOPS.get(name, 4.0)
         lengths.append(loop * max(round(SCENE_SECONDS / loop), 1))
     at %= sum(lengths)
-    for (name, lines), length in zip(scenes, lengths):
-        if at < length:
-            break
-        at -= length
+    showing = 0
+    while at >= lengths[showing]:
+        at -= lengths[showing]
+        showing += 1
+    name, lines = scenes[showing]
     clip = film(name)
     clip.draw(int(at * clip.fps) % clip.frames)
     caption(lines[int(at / CAPTION_SECONDS) % len(lines)])

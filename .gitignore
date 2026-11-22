@@ -1,0 +1,9 @@
+build/
+cap/out/
+__pycache__/
+tools/data/earth.png
+tools/data/cities15000.zip
+tools/data/ne_50m_*.geojson
+cap/sheet*.png
+cap/page.png
+cap/which.txt
